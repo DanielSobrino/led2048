@@ -13,7 +13,7 @@ extern const char* Directions[];
 extern volatile float accel_x, accel_y;
 
 extern volatile bool movimiento_detectado;
-extern volatile bool movimiento_procesado;
+extern volatile bool procesar_movimiento;
 extern volatile Direction process_direction;
 
 extern sensors_event_t event;

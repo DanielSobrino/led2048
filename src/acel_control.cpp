@@ -11,7 +11,7 @@ enum Estado { ESPERA_DIRECCION, ESPERA_POS_ESTABLE } estado;
 
 volatile float accel_x, accel_y;
 volatile bool movimiento_detectado = false;
-volatile bool movimiento_procesado = false;
+volatile bool procesar_movimiento = false;
 Ticker ticker_accel;
 
 // portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
@@ -22,7 +22,7 @@ void leer_accel();
 
 float init_x, init_y;
 const float movement_threshold = 5.0;
-const float stable_threshold = 2.0;
+const float stable_threshold = 3.0;
 
 Adafruit_LIS3DH lis = Adafruit_LIS3DH();
 
@@ -62,7 +62,7 @@ void leer_accel() {
 
       if (old_direction != NONE && direction == NONE) {
         movimiento_detectado = false;
-        movimiento_procesado = false;
+        procesar_movimiento = false;
       } else if (direction != NONE) {
         movimiento_detectado = true;
         estado = ESPERA_POS_ESTABLE;

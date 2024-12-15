@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <vector>
 #include "acel_control.hpp"
+#include "led_control.hpp"
 using namespace std;
 
 #define side 4
@@ -11,7 +12,6 @@ void spawnNumber();
 bool move(Direction dir);
 void startGame();
 bool checkGameOver();
-void process_accel();
 
 uint16_t tablero[side*side]; //current board
 uint16_t last_tablero[side*side]; //last board
@@ -26,12 +26,16 @@ void setup(void) {
   Serial.begin(115200);
   setCpuFrequencyMhz(80);
   setupAccel();
+  test_colors();
   startGame();
 }
 
 void loop() {
 
-  process_accel();
+  accel_x = event.acceleration.x;
+  accel_y = event.acceleration.y;
+
+  procesar_movimiento = (process_direction != NONE && !procesar_movimiento && movimiento_detectado);
 
   if (hasLost) {
     Serial.printf("You lost!\n");
@@ -41,33 +45,12 @@ void loop() {
     Serial.printf("You won!\n");
     delay(1000);
     startGame();
-  } else if (Serial.available() > 0) {
-    char ch = Serial.read();
+  } else if (procesar_movimiento) {
     bool hasMoved;
-    Direction dir;
-    Serial.printf("Pressed %c (%d)\n", ch, ch);
-    switch (ch) {
-      case 'w':
-        dir = UP;
-        break;
-      case 'a':
-        dir = LEFT;
-        break;
-      case 's':
-        dir = DOWN;
-        break;
-      case 'd':
-        dir = RIGHT;
-        break;
-      case 'r': // single tap??
-        startGame();
-        dir = NONE;
-        break;
-      default:
-        dir = NONE;
-    }
-    if (dir != NONE) {
-      hasMoved = move(dir);
+    Serial.printf("Dir: %s\n", Directions[process_direction]);
+
+    if (procesar_movimiento) {
+      hasMoved = move(process_direction);
       if (anyEmpties == false) {
         hasLost = checkGameOver();
         if (hasLost) {
@@ -77,31 +60,12 @@ void loop() {
       if (hasMoved) {
         spawnNumber();
       }
+      process_direction = NONE;
     }
     displayGrid();
   }
 
   delayMicroseconds(100);
-}
-
-void process_accel() {
-
-  // portENTER_CRITICAL(&mux);
-
-  accel_x = event.acceleration.x;
-  accel_y = event.acceleration.y;
-
-  if (process_direction != NONE && !movimiento_procesado && movimiento_detectado) {
-    Serial.printf("X: %6.2f  Y: %6.2f \n", accel_x, accel_y);
-    Serial.printf("Dir: %s proc: %s detec: %s \n", Directions[process_direction], movimiento_procesado ? "true" : "false", movimiento_detectado ? "true" : "false");
-
-    // mover leds
-    movimiento_procesado = true;
-    process_direction = NONE;
-  }
-
-  // portEXIT_CRITICAL(&mux);
-
 }
 
 void displayGrid() {
