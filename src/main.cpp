@@ -20,13 +20,13 @@ uint8_t empty_cells[side*side]; //empty cells indexes
 bool anyEmpties = true;
 bool hasLost;
 bool hasWon;
-uint16_t victoryNumber = 64;
+uint16_t victoryNumber = 16;
 
 void setup(void) {
   Serial.begin(115200);
   setCpuFrequencyMhz(80);
   setupAccel();
-  test_colors();
+  init_leds();
   startGame();
 }
 
@@ -63,6 +63,7 @@ void loop() {
       process_direction = NONE;
     }
     displayGrid();
+    update_leds(tablero);
   }
 
   delayMicroseconds(100);
@@ -93,7 +94,8 @@ void spawnNumber() {
     Serial.printf("ERROR: No se ha podido spawnear!!!\n");
   } else {
     int random_cell = rand() % num_empty_cells;
-    tablero[empty_cells[random_cell]] = 2;
+    int num = rand() % 10 == 0 ? 4 : 2;
+    tablero[empty_cells[random_cell]] = num;
   }
 
 }
@@ -168,7 +170,6 @@ bool move(Direction dir) {
             linea_temp.push_back(val1*2);
             if (val1*2 == victoryNumber) {
               hasWon = true;
-              Serial.printf("Has ganado!!!\n");
             }
             val1 = 0;
           } else {
@@ -222,6 +223,7 @@ void startGame() {
   spawnNumber();
   spawnNumber();
   displayGrid();
+  update_leds(tablero);
 }
 
 bool checkGameOver() {
