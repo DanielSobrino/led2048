@@ -8,6 +8,8 @@
 
 CRGB leds[NUM_LEDS];
 
+void clear_leds();
+
 const CRGB colorPalette[] = {
   CRGB::White,  // 2
   CRGB(60,60,60),    // 4
@@ -52,5 +54,51 @@ void test_colors() {
     leds[i] = colorPalette[i];
   }
 
+  FastLED.show();
+}
+
+void win_animation() {
+  // rainbow animation
+  for (int i = 0; i < 256; i++) {
+    for (int j = 0; j < NUM_LEDS; j++) {
+      leds[j] = CHSV(i + j * 10, 255, 255);
+    }
+    FastLED.show();
+    delay(1);
+  }
+}
+
+void start_animation() {
+  int secuencia[] = {0, 1, 2, 3, 7, 11, 15, 14, 13, 12, 8, 4, 5, 6, 10, 9};
+  for (int i = 0; i < NUM_LEDS; i++) {
+    // color change
+    leds[secuencia[i]] = CHSV(i*255/NUM_LEDS, 255, 255);
+    FastLED.show();
+    delay(30);
+  }
+  delay(100);
+  for (int i = NUM_LEDS-1; i >= 0; i--) {
+    // color change
+    leds[secuencia[i]] = CRGB::Black;
+    FastLED.show();
+    delay(30);
+  }
+}
+
+void lose_animation(uint16_t *tablero) {
+  float begin = millis();
+  int tickingTime = 4000;
+  while (millis() - begin < tickingTime) {
+    delay(200);
+    clear_leds();
+    delay(200);
+    update_leds(tablero);
+  }
+}
+
+void clear_leds() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Black;
+  }
   FastLED.show();
 }

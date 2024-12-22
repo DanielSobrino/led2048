@@ -20,7 +20,7 @@ uint8_t empty_cells[side*side]; //empty cells indexes
 bool anyEmpties = true;
 bool hasLost;
 bool hasWon;
-uint16_t victoryNumber = 16;
+uint16_t victoryNumber = 8;
 
 void setup(void) {
   Serial.begin(115200);
@@ -38,13 +38,10 @@ void loop() {
   procesar_movimiento = (process_direction != NONE && !procesar_movimiento && movimiento_detectado);
 
   if (hasLost) {
-    Serial.printf("You lost!\n");
-    delay(1000);
+    lose_animation(tablero);
     startGame();
   } else if (hasWon) {
-    Serial.printf("You won!\n");
-    delay(1000);
-    startGame();
+    win_animation();
   } else if (procesar_movimiento) {
     bool hasMoved;
     Serial.printf("Dir: %s\n", Directions[process_direction]);
@@ -114,6 +111,7 @@ bool move(Direction dir) {
   uint8_t ini_cell;
   int8_t offset;
   uint8_t next_line_index;
+  int valorMax = 0;
 
   switch (dir) {
     case DOWN:
@@ -167,7 +165,12 @@ bool move(Direction dir) {
           val1 = val;
         } else {
           if (val1 == val) {
-            linea_temp.push_back(val1*2);
+            int valorNuevo = val1*2;
+            valorMax = max(valorNuevo, valorMax);
+            if (valorMax > 0) {
+              // sonidos
+            }
+            linea_temp.push_back(valorNuevo);
             if (val1*2 == victoryNumber) {
               hasWon = true;
             }
@@ -220,6 +223,7 @@ void startGame() {
   hasWon = false;
   srand((unsigned)time(NULL));
   fill(tablero, tablero+side*side, 0);
+  start_animation();
   spawnNumber();
   spawnNumber();
   displayGrid();
