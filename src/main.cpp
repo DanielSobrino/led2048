@@ -3,6 +3,7 @@
 #include <vector>
 #include "acel_control.hpp"
 #include "led_control.hpp"
+#include "sound_control.hpp"
 using namespace std;
 
 #define side 4
@@ -20,17 +21,20 @@ uint8_t empty_cells[side*side]; //empty cells indexes
 bool anyEmpties = true;
 bool hasLost;
 bool hasWon;
-uint16_t victoryNumber = 8;
+uint16_t victoryNumber = 32;
 
 void setup(void) {
   Serial.begin(115200);
   setCpuFrequencyMhz(80);
   setupAccel();
   init_leds();
+  init_sound();
+  test_sound();
   startGame();
 }
 
 void loop() {
+  DacAudio.FillBuffer();
 
   accel_x = event.acceleration.x;
   accel_y = event.acceleration.y;
@@ -167,9 +171,6 @@ bool move(Direction dir) {
           if (val1 == val) {
             int valorNuevo = val1*2;
             valorMax = max(valorNuevo, valorMax);
-            if (valorMax > 0) {
-              // sonidos
-            }
             linea_temp.push_back(valorNuevo);
             if (val1*2 == victoryNumber) {
               hasWon = true;
@@ -191,6 +192,10 @@ bool move(Direction dir) {
     }
   
     tablero_temp[j] = linea_temp;
+  }
+
+  if (valorMax > 0 && !hasWon) {
+    play_note_for_score((int8_t)valorMax);
   }
 
   //Reconstruccion
