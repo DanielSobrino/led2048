@@ -33,8 +33,8 @@ void setupAccel() {
   lis.read();
   lis.getEvent(&event);
   
-  init_x = event.acceleration.x;
-  init_y = event.acceleration.y;
+  init_x = 0;
+  init_y = 0;
   estado = ESPERA_DIRECCION;
 
   ticker_accel.attach_ms(100, leer_accel);

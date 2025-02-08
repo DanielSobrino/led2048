@@ -21,7 +21,8 @@ uint8_t empty_cells[side*side]; //empty cells indexes
 bool anyEmpties = true;
 bool hasLost;
 bool hasWon;
-uint16_t victoryNumber = 32;
+bool hasPLayed = false;
+uint16_t victoryNumber = 1024;
 
 void setup(void) {
   Serial.begin(115200);
@@ -29,7 +30,8 @@ void setup(void) {
   setupAccel();
   init_leds();
   init_sound();
-  test_sound();
+  // test_sound();
+  play_start();
   startGame();
 }
 
@@ -42,9 +44,14 @@ void loop() {
   procesar_movimiento = (process_direction != NONE && !procesar_movimiento && movimiento_detectado);
 
   if (hasLost) {
+    play_loss();
     lose_animation(tablero);
     startGame();
   } else if (hasWon) {
+    if (!hasPLayed) {
+      hasPLayed = true;
+      play_win();
+    }
     win_animation();
   } else if (procesar_movimiento) {
     bool hasMoved;
@@ -226,6 +233,7 @@ bool move(Direction dir) {
 void startGame() {
   hasLost = false;
   hasWon = false;
+  hasPLayed = false;
   srand((unsigned)time(NULL));
   fill(tablero, tablero+side*side, 0);
   start_animation();

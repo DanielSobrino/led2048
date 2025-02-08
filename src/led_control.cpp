@@ -1,4 +1,5 @@
 #include "led_control.hpp"
+#include "sound_control.hpp"
 
 #define DATA_PIN    GPIO_NUM_12
 #define LED_TYPE    WS2812B
@@ -61,6 +62,7 @@ void win_animation() {
   // rainbow animation
   for (int i = 0; i < 256; i++) {
     for (int j = 0; j < NUM_LEDS; j++) {
+      DacAudio.FillBuffer();
       leds[j] = CHSV(i + j * 10, 255, 255);
     }
     FastLED.show();
@@ -72,12 +74,13 @@ void start_animation() {
   int secuencia[] = {0, 1, 2, 3, 7, 11, 15, 14, 13, 12, 8, 4, 5, 6, 10, 9};
   for (int i = 0; i < NUM_LEDS; i++) {
     // color change
+    DacAudio.FillBuffer();
     leds[secuencia[i]] = CHSV(i*255/NUM_LEDS, 255, 255);
     FastLED.show();
     delay(30);
   }
-  delay(100);
   for (int i = NUM_LEDS-1; i >= 0; i--) {
+    DacAudio.FillBuffer();
     // color change
     leds[secuencia[i]] = CRGB::Black;
     FastLED.show();
@@ -87,12 +90,22 @@ void start_animation() {
 
 void lose_animation(uint16_t *tablero) {
   float begin = millis();
+  float pauseBegin = millis();
   int tickingTime = 4000;
+  int pause = 200;
+  bool isClear = false;
   while (millis() - begin < tickingTime) {
-    delay(200);
-    clear_leds();
-    delay(200);
-    update_leds(tablero);
+    DacAudio.FillBuffer();
+    if (millis() - pauseBegin > pause) {
+      if (isClear) {
+        isClear = false;
+        clear_leds();
+      } else {
+        isClear = true;
+        update_leds(tablero);
+      }
+      pauseBegin = millis();
+    }
   }
 }
 
