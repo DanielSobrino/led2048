@@ -122,7 +122,7 @@ bool move(Direction dir) {
   uint8_t ini_cell;
   int8_t offset;
   uint8_t next_line_index;
-  int valorMax = 0;
+  int16_t valorMax = 0;
 
   switch (dir) {
     case DOWN:
@@ -176,7 +176,7 @@ bool move(Direction dir) {
           val1 = val;
         } else {
           if (val1 == val) {
-            int valorNuevo = val1*2;
+            int16_t valorNuevo = val1*2;
             valorMax = max(valorNuevo, valorMax);
             linea_temp.push_back(valorNuevo);
             if (val1*2 == victoryNumber) {
@@ -202,7 +202,7 @@ bool move(Direction dir) {
   }
 
   if (valorMax > 0 && !hasWon) {
-    play_note_for_score((int8_t)valorMax);
+    play_note_for_score(valorMax);
   }
 
   //Reconstruccion
