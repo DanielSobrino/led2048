@@ -40,6 +40,13 @@ void play_loss() {
   DacAudio.Play(CurrentSound);
 }
 
+void play_highscore() {
+  delete CurrentSound;
+  CurrentSound = new XT_Wav_Class(highscore_sound);
+  CurrentSound->SampleRate = 8000;
+  DacAudio.Play(CurrentSound);
+}
+
 void newNote(XT_Wav_Class note) {
   delete CurrentSound;
   CurrentSound = new XT_Wav_Class(note);

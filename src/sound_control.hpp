@@ -14,6 +14,7 @@ extern void play_note_for_score(int16_t note);
 extern void play_start();
 extern void play_win();
 extern void play_loss();
+extern void play_highscore();
 extern void test_sound();
 
 extern XT_DAC_Audio_Class DacAudio;

@@ -23,6 +23,7 @@ bool hasLost;
 bool hasWon;
 bool hasPLayed = false;
 uint16_t victoryNumber = 1024;
+uint16_t highscore = 4;
 
 void setup(void) {
   Serial.begin(115200);
@@ -202,7 +203,12 @@ bool move(Direction dir) {
   }
 
   if (valorMax > 0 && !hasWon) {
-    play_note_for_score(valorMax);
+    if (valorMax > highscore) {
+      highscore = valorMax;
+      play_highscore();
+    } else {
+      play_note_for_score(valorMax);
+    }
   }
 
   //Reconstruccion
